@@ -12,21 +12,12 @@ struct ContentView: View {
     @State var inc: CGFloat = 0.1
     var body: some View {
         VStack(alignment: .center) {
-//            Button("Increase Progress") {
-//                self.inc += 0.1
-//            }
-            ProgressIndicator(progress: $inc)
-            //ProgressView(progress: $inc)
+            ProgressIndicator()
         }
-//        .padding(.leading, 32)
-//        .padding(.trailing, 32)
-        
     }
 }
 
 struct ProgressIndicator: View {
-    @Binding var progress: CGFloat
-    @GestureState private var dragOffset = CGSize.zero
     @State private var position = CGSize.zero
 
     let balloon = Path { p in
@@ -42,6 +33,7 @@ struct ProgressIndicator: View {
         p.addQuadCurve(to: CGPoint(x: 20, y: 0),
                        control: CGPoint(x: 40, y: 0))
     }
+    
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
@@ -58,19 +50,11 @@ struct ProgressIndicator: View {
                 .gesture(
                      DragGesture()
                     .onChanged({ (value) in
-                        if String(format: "%.0f %%", ((self.position.width) * 100)/(geometry.size.width - 40)) == "100 %" {
-                            self.position.width = geometry.size.width - 40
-                        }
-                        else {
-                            self.position.width += value.location.x
-                        }
-                    })
-                        .onEnded({ (value) in
-                          if String(format: "%.0f %%", ((self.position.width) * 100)/(geometry.size.width - 40)) == "100 %" {
-                              self.position.width = geometry.size.width - 40
-                          }
+                        self.position.width = min(self.position.width + value.location.x, geometry.size.width - 40)
+                        
                     })
                 )
+               
                 .offset(x: self.position.width - 20, y: 0)
                 
                 ZStack(alignment: .leading) {
